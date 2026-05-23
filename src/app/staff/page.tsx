@@ -1124,7 +1124,7 @@ export default function StaffPage() {
                     className={`flex-1 flex flex-col items-center py-2 text-[10px] font-medium transition-colors
                                ${nav === item.key ? 'text-pink-500' : 'text-gray-400'}`}>
               <span className="text-base">{item.icon}</span>
-              <span className="mt-0.5 leading-tight">{item.label.replace('ありがとう','').replace('もらった','受信').replace('送った','送信')}</span>
+              <span className="mt-0.5 leading-tight">{item.label.replace('ありがとうを送る','送る').replace('もらったありがとう','受信').replace('送ったありがとう','送信').replace('ありがとう','')}</span>
             </button>
           ))}
         </nav>
