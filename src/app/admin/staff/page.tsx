@@ -9,7 +9,7 @@ export default function StaffManagePage() {
   const [loading, setLoading] = useState(true);
   const [modal, setModal] = useState<'edit' | 'add' | 'pw' | null>(null);
   const [editUser, setEditUser] = useState<UserStats | null>(null);
-  const [form, setForm] = useState({ login_id: '', name: '', password: '', role: 'staff' });
+  const [form, setForm] = useState({ login_id: '', name: '', password: '', role: 'staff', birthdayMonth: '', birthdayDay: '' });
   const [pwForm, setPwForm] = useState({ password: '', confirm: '' });
   const [saving, setSaving] = useState(false);
 
@@ -23,13 +23,14 @@ export default function StaffManagePage() {
 
   const openAdd = () => {
     setEditUser(null);
-    setForm({ login_id: '', name: '', password: '', role: 'staff' });
+    setForm({ login_id: '', name: '', password: '', role: 'staff', birthdayMonth: '', birthdayDay: '' });
     setModal('add');
   };
 
   const openEdit = (user: UserStats) => {
     setEditUser(user);
-    setForm({ login_id: user.login_id, name: user.name, password: '', role: user.role });
+    const [bm, bd] = user.birthday ? user.birthday.split('-') : ['', ''];
+    setForm({ login_id: user.login_id, name: user.name, password: '', role: user.role, birthdayMonth: bm, birthdayDay: bd });
     setModal('edit');
   };
 
@@ -51,13 +52,13 @@ export default function StaffManagePage() {
         res = await fetch(`/api/admin/users/${editUser.id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ name: form.name, role: form.role }),
+          body: JSON.stringify({ name: form.name, role: form.role, birthday: form.birthdayMonth && form.birthdayDay ? `${form.birthdayMonth}-${form.birthdayDay}` : null }),
         });
       } else {
         res = await fetch('/api/admin/users', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ login_id: form.login_id, name: form.name, password: form.password, role: form.role }),
+          body: JSON.stringify({ login_id: form.login_id, name: form.name, password: form.password, role: form.role, birthday: form.birthdayMonth && form.birthdayDay ? `${form.birthdayMonth}-${form.birthdayDay}` : null }),
         });
       }
       const json = await res.json();
@@ -119,6 +120,7 @@ export default function StaffManagePage() {
                   <tr className="bg-pink-50 text-gray-500 text-xs">
                     <th className="text-left px-4 py-3 font-semibold">氏名</th>
                     <th className="text-left px-4 py-3 font-semibold hidden sm:table-cell">ログインID</th>
+                    <th className="text-left px-4 py-3 font-semibold hidden lg:table-cell">誕生日</th>
                     <th className="text-center px-3 py-3 font-semibold">送信</th>
                     <th className="text-center px-3 py-3 font-semibold">受信</th>
                     <th className="text-center px-3 py-3 font-semibold">権限</th>
@@ -130,6 +132,9 @@ export default function StaffManagePage() {
                     <tr key={user.id} className="border-t border-pink-50 hover:bg-pink-50/40 transition-colors">
                       <td className="px-4 py-2.5 font-medium text-gray-700">{user.name}</td>
                       <td className="px-4 py-2.5 text-gray-400 hidden sm:table-cell font-mono text-xs">{user.login_id}</td>
+                      <td className="px-4 py-2.5 text-gray-500 hidden lg:table-cell text-xs">
+                        {user.birthday ? (() => { const [m, d] = user.birthday!.split('-'); return `${parseInt(m)}月${parseInt(d)}日`; })() : '-'}
+                      </td>
                       <td className="px-3 py-2.5 text-center font-semibold text-pink-500">{user.send_count}</td>
                       <td className="px-3 py-2.5 text-center font-semibold text-rose-400">{user.receive_count}</td>
                       <td className="px-3 py-2.5 text-center">
@@ -186,6 +191,25 @@ export default function StaffManagePage() {
                   <option value="staff">スタッフ</option>
                   <option value="admin">管理者</option>
                 </select>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-gray-500 block mb-1.5">誕生日</label>
+                <div className="flex gap-2">
+                  <select value={form.birthdayMonth} onChange={e => setForm(f => ({ ...f, birthdayMonth: e.target.value }))}
+                          className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-pink-300">
+                    <option value="">月</option>
+                    {Array.from({ length: 12 }, (_, i) => (
+                      <option key={i + 1} value={String(i + 1).padStart(2, '0')}>{i + 1}月</option>
+                    ))}
+                  </select>
+                  <select value={form.birthdayDay} onChange={e => setForm(f => ({ ...f, birthdayDay: e.target.value }))}
+                          className="flex-1 px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-pink-300">
+                    <option value="">日</option>
+                    {Array.from({ length: 31 }, (_, i) => (
+                      <option key={i + 1} value={String(i + 1).padStart(2, '0')}>{i + 1}日</option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             <div className="flex gap-3 mt-5">

@@ -45,6 +45,7 @@ export interface UserStats {
   login_id: string;
   name: string;
   role: UserRole;
+  birthday?: string;
   department_name?: string;
   send_count: number;
   receive_count: number;

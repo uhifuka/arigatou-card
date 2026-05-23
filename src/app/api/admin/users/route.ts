@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
   if (session.role !== 'admin') return NextResponse.json({ error: '権限がありません' }, { status: 403 });
 
   try {
-    const { login_id, name, password, role, department_id } = await req.json();
+    const { login_id, name, password, role, department_id, birthday } = await req.json();
 
     if (!login_id || !name || !password) {
       return NextResponse.json({ error: 'ID・氏名・パスワードは必須です' }, { status: 400 });
@@ -46,7 +46,7 @@ export async function POST(req: NextRequest) {
 
     const { data, error } = await supabaseAdmin
       .from('users')
-      .insert({ login_id, name, password_hash, role: role || 'staff', department_id: department_id || null })
+      .insert({ login_id, name, password_hash, role: role || 'staff', department_id: department_id || null, birthday: birthday || null })
       .select('id, login_id, name, role')
       .single();
 

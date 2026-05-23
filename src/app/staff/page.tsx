@@ -411,6 +411,11 @@ export default function StaffPage() {
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
   const [rankingData, setRankingData] = useState<{ send_ranking: any[]; receive_ranking: any[] } | null>(null);
   const [rankingMonth, setRankingMonth] = useState(() => new Date().toISOString().substring(0, 7));
+  const [todayBirthdays, setTodayBirthdays] = useState<{ id: string; name: string }[]>([]);
+  const [congratsSent, setCongratusSent] = useState<Set<string>>(new Set());
+  const [pwOpen, setPwOpen] = useState(false);
+  const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
+  const [pwSaving, setPwSaving] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.push('/login');
@@ -451,7 +456,14 @@ export default function StaffPage() {
     } catch {}
   }, []);
 
-  useEffect(() => { if (session) { fetchData(); fetchTreeData(); fetchRanking(rankingMonth); } }, [session, fetchData, fetchTreeData, fetchRanking, rankingMonth]);
+  const fetchBirthdays = useCallback(async () => {
+    try {
+      const res = await fetch('/api/birthdays/today');
+      if (res.ok) setTodayBirthdays((await res.json()).data || []);
+    } catch {}
+  }, []);
+
+  useEffect(() => { if (session) { fetchData(); fetchTreeData(); fetchRanking(rankingMonth); fetchBirthdays(); } }, [session, fetchData, fetchTreeData, fetchRanking, fetchBirthdays, rankingMonth]);
 
   const handleSend = async () => {
     if (!receiverId) { toast.error('送り先を選択してください'); return; }
@@ -474,6 +486,48 @@ export default function StaffPage() {
       fetchTreeData();
     } catch { toast.error('送信に失敗しました'); }
     finally { setSending(false); }
+  };
+
+  const sendCongrats = async (receiverId: string, receiverName: string) => {
+    const res = await fetch('/api/thanks', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        receiver_id: receiverId,
+        message: `🎂 ${receiverName}さん、お誕生日おめでとうございます！素敵な一日になりますように✨`,
+        sent_date: getTodayString(),
+      }),
+    });
+    if (res.ok) {
+      setCongratusSent(s => { const n = new Set(s); n.add(receiverId); return n; });
+      toast.success('🎉 お祝いを送りました！');
+      setTotalCount(c => c + 1);
+      fetchData();
+      fetchTreeData();
+    } else {
+      const json = await res.json();
+      toast.error(json.error || 'エラーが発生しました');
+    }
+  };
+
+  const handlePwChange = async () => {
+    if (!pwForm.current) { toast.error('現在のパスワードを入力してください'); return; }
+    if (!pwForm.next || pwForm.next.length < 4) { toast.error('新しいパスワードは4文字以上で入力してください'); return; }
+    if (pwForm.next !== pwForm.confirm) { toast.error('パスワードが一致しません'); return; }
+    setPwSaving(true);
+    try {
+      const res = await fetch('/api/auth/change-password', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: pwForm.current, newPassword: pwForm.next }),
+      });
+      const json = await res.json();
+      if (!res.ok) { toast.error(json.error); return; }
+      toast.success('パスワードを変更しました');
+      setPwOpen(false);
+      setPwForm({ current: '', next: '', confirm: '' });
+    } catch { toast.error('エラーが発生しました'); }
+    finally { setPwSaving(false); }
   };
 
   if (loading || !session) {
@@ -605,6 +659,38 @@ export default function StaffPage() {
                     <BearChar style={{width:'48px',height:'48px'}}/>
                   </div>
               </div>
+
+              {/* 誕生日カード */}
+              {todayBirthdays.length > 0 && (
+                <div className="rounded-2xl overflow-hidden shadow-sm border border-amber-100">
+                  <div className="px-4 py-3 flex items-center gap-2"
+                       style={{ background: 'linear-gradient(135deg, #fff8e1, #fff3cd)' }}>
+                    <span className="text-xl">🎂</span>
+                    <h3 className="text-sm font-bold text-amber-700">今日はお誕生日！</h3>
+                  </div>
+                  <div className="p-3 space-y-2" style={{ background: 'linear-gradient(135deg, #fffde7, #fff8e1)' }}>
+                    {todayBirthdays.map(person => (
+                      <div key={person.id} className="bg-white/80 rounded-xl px-3 py-2.5 flex items-center justify-between gap-2">
+                        <div className="flex items-center gap-2 min-w-0">
+                          <span className="text-lg shrink-0">🎉</span>
+                          <p className="text-sm font-bold text-amber-700 truncate">{person.name}さんのお誕生日</p>
+                        </div>
+                        {person.id === session.userId ? (
+                          <span className="text-xs text-amber-500 font-semibold shrink-0">あなたの誕生日✨</span>
+                        ) : congratsSent.has(person.id) ? (
+                          <span className="text-xs text-green-500 font-semibold shrink-0">✅ 送信済み</span>
+                        ) : (
+                          <button onClick={() => sendCongrats(person.id, person.name)}
+                                  className="px-3 py-1.5 rounded-xl text-xs font-bold text-white shadow-sm transition-all active:scale-95 shrink-0"
+                                  style={{ background: 'linear-gradient(135deg, #ff9800, #f57c00)' }}>
+                            🎉 おめでとう！
+                          </button>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
               {/* 統計 */}
               <div className="grid grid-cols-2 gap-3">
@@ -974,6 +1060,50 @@ export default function StaffPage() {
                     )}
                   </>
                 }
+              </div>
+
+              {/* パスワード変更 */}
+              <div className="bg-white rounded-2xl p-5 mt-3" style={{ boxShadow:'0 2px 12px rgba(255,143,171,0.1)' }}>
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="text-sm font-bold text-gray-600">🔑 パスワード変更</h3>
+                  {!pwOpen && (
+                    <button onClick={() => setPwOpen(true)}
+                            className="text-xs px-3 py-1.5 rounded-xl bg-gray-100 text-gray-500 hover:bg-gray-200 transition-colors">
+                      変更する
+                    </button>
+                  )}
+                </div>
+                {pwOpen && (
+                  <div className="space-y-3 mt-2">
+                    {([
+                      { label: '現在のパスワード', field: 'current', ph: '現在のパスワード' },
+                      { label: '新しいパスワード', field: 'next', ph: '4文字以上' },
+                      { label: '確認用パスワード', field: 'confirm', ph: 'もう一度入力' },
+                    ] as const).map(({ label, field, ph }) => (
+                      <div key={field}>
+                        <label className="text-xs font-semibold text-gray-400 block mb-1">{label}</label>
+                        <input type="password" value={pwForm[field]}
+                               onChange={e => setPwForm(f => ({ ...f, [field]: e.target.value }))}
+                               placeholder={ph}
+                               className="w-full px-3 py-2.5 rounded-xl border border-gray-200 text-sm text-gray-700 focus:outline-none focus:border-pink-300 transition-colors"/>
+                      </div>
+                    ))}
+                    {pwForm.next && pwForm.confirm && pwForm.next !== pwForm.confirm && (
+                      <p className="text-xs text-red-400">パスワードが一致しません</p>
+                    )}
+                    <div className="flex gap-2 pt-1">
+                      <button onClick={() => { setPwOpen(false); setPwForm({ current: '', next: '', confirm: '' }); }}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-gray-500 bg-gray-100 hover:bg-gray-200 transition-colors">
+                        キャンセル
+                      </button>
+                      <button onClick={handlePwChange} disabled={pwSaving}
+                              className="flex-1 py-2.5 rounded-xl text-sm font-semibold text-white shadow-sm transition-all active:scale-95 disabled:opacity-60"
+                              style={{ background: 'linear-gradient(135deg, #5c8ae8, #7b68ee)' }}>
+                        {pwSaving ? '変更中...' : '変更する'}
+                      </button>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

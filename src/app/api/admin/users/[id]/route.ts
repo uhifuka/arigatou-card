@@ -10,13 +10,14 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
   if (session.role !== 'admin') return NextResponse.json({ error: '権限がありません' }, { status: 403 });
 
   try {
-    const { name, role, department_id, is_active, password } = await req.json();
-    
+    const { name, role, department_id, is_active, password, birthday } = await req.json();
+
     const updates: Record<string, unknown> = {};
     if (name !== undefined) updates.name = name;
     if (role !== undefined) updates.role = role;
     if (department_id !== undefined) updates.department_id = department_id || null;
     if (is_active !== undefined) updates.is_active = is_active;
+    if (birthday !== undefined) updates.birthday = birthday || null;
     if (password) {
       updates.password_hash = await bcrypt.hash(password, 10);
     }
