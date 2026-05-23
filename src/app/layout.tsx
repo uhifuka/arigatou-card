@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Noto_Sans_JP } from 'next/font/google';
 import { Toaster } from 'react-hot-toast';
 import './globals.css';
@@ -12,7 +12,22 @@ const notoSans = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: 'ありがとうカード | 上田皮ふ科',
   description: 'スタッフ同士で感謝を伝えるシステム',
-  viewport: 'width=device-width, initial-scale=1',
+  appleWebApp: {
+    capable: true,
+    title: 'ありがとう',
+    statusBarStyle: 'default',
+  },
+  formatDetection: {
+    telephone: false,
+  },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: '#7cc377',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
