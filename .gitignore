@@ -1,0 +1,26 @@
+# Node
+node_modules/
+.npm
+
+# Next.js
+.next/
+out/
+
+# 環境変数（絶対にGitにコミットしないこと）
+.env
+.env.local
+.env.*.local
+
+# デバッグ
+npm-debug.log*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# TypeScript
+*.tsbuildinfo
+next-env.d.ts
+
+# Claude Code ローカル設定（個人設定のためコミットしない）
+.claude/settings.local.json
