@@ -84,11 +84,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               </Link>
             );
           })}
-          {/* 設定（将来用） */}
           <div className="pt-2 border-t border-gray-50 mt-2">
-            <span className="flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium text-gray-300 cursor-not-allowed">
+            <Link href="/admin/settings"
+                  className={`flex items-center gap-2.5 px-3 py-2.5 rounded-xl text-xs font-medium transition-all
+                             ${pathname.startsWith('/admin/settings') ? 'nav-active' : 'text-gray-500 hover:bg-green-50 hover:text-green-600'}`}>
               <span>⚙️</span>設定
-            </span>
+            </Link>
           </div>
         </nav>
 
