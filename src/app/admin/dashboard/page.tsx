@@ -277,11 +277,6 @@ function RankingCard({ title, entries, colorClass, bgClass }: {
                   </p>
                 </div>
               ))}
-              {entries.length > 5 && (
-                <button className="w-full text-xs text-pink-400 hover:text-pink-600 pt-1 transition-colors">
-                  もっと見る ›
-                </button>
-              )}
             </div>
           )
         }

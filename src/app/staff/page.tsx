@@ -13,7 +13,7 @@ interface StaffUser {
   departments?: { name: string };
 }
 
-type NavItem = 'home' | 'send' | 'received' | 'sent' | 'mypage' | 'tree';
+type NavItem = 'home' | 'send' | 'received' | 'sent' | 'mypage' | 'tree' | 'ranking';
 
 // ===================== 桜の木コンポーネント =====================
 function SakuraTree({ totalCount }: { totalCount: number }) {
@@ -409,6 +409,8 @@ export default function StaffPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [treeData, setTreeData] = useState<Record<string, number>>({});
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
+  const [rankingData, setRankingData] = useState<{ send_ranking: any[]; receive_ranking: any[] } | null>(null);
+  const [rankingMonth, setRankingMonth] = useState(() => new Date().toISOString().substring(0, 7));
 
   useEffect(() => {
     if (!loading && !session) router.push('/login');
@@ -439,7 +441,17 @@ export default function StaffPage() {
     if (receivedRes.ok) setReceivedMessages((await receivedRes.json()).data || []);
   }, []);
 
-  useEffect(() => { if (session) { fetchData(); fetchTreeData(); } }, [session, fetchData, fetchTreeData]);
+  const fetchRanking = useCallback(async (month: string) => {
+    try {
+      const res = await fetch(`/api/ranking?month=${month}`);
+      if (res.ok) {
+        const { data } = await res.json();
+        setRankingData(data);
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => { if (session) { fetchData(); fetchTreeData(); fetchRanking(rankingMonth); } }, [session, fetchData, fetchTreeData, fetchRanking, rankingMonth]);
 
   const handleSend = async () => {
     if (!receiverId) { toast.error('送り先を選択してください'); return; }
@@ -475,6 +487,7 @@ export default function StaffPage() {
     { key: 'send',     icon: '✈️', label: 'ありがとうを送る' },
     { key: 'received', icon: '💗', label: 'もらったありがとう' },
     { key: 'sent',     icon: '✈️', label: '送ったありがとう' },
+    { key: 'ranking',  icon: '🏆', label: 'ランキング' },
     { key: 'tree',     icon: '🌳', label: '感謝の木' },
     { key: 'mypage',   icon: '👤', label: 'マイページ' },
   ];
@@ -722,6 +735,101 @@ export default function StaffPage() {
                     <p className="text-sm text-gray-600 leading-relaxed bg-blue-50 rounded-xl px-3 py-2.5">{m.message}</p>
                   </div>
                 ))}
+            </div>
+          )}
+
+          {/* ランキング */}
+          {nav === 'ranking' && (
+            <div className="max-w-2xl mx-auto space-y-4 fade-slide">
+              <div className="text-center mb-2">
+                <h2 className="text-lg font-bold text-gray-700">🏆 今月のランキング</h2>
+                <p className="text-xs text-gray-400 mt-0.5">ありがとうの送受信 トップ5</p>
+              </div>
+
+              {/* 月選択 */}
+              <div className="bg-white rounded-2xl px-4 py-3 flex items-center gap-3"
+                   style={{ boxShadow: '0 2px 12px rgba(255,143,171,0.08)' }}>
+                <span className="text-xs text-gray-500 font-semibold whitespace-nowrap">📅 対象月：</span>
+                <select value={rankingMonth}
+                        onChange={e => { setRankingMonth(e.target.value); fetchRanking(e.target.value); }}
+                        className="flex-1 px-3 py-1.5 rounded-xl border border-pink-100 text-sm text-gray-700 bg-pink-50">
+                  {Array.from({ length: 6 }, (_, i) => {
+                    const d = new Date();
+                    d.setMonth(d.getMonth() - i);
+                    const val = d.toISOString().substring(0, 7);
+                    const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+                    return <option key={val} value={val}>{label}</option>;
+                  })}
+                </select>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-4">
+                {/* 送信ランキング */}
+                <div className="bg-white rounded-2xl overflow-hidden"
+                     style={{ boxShadow: '0 2px 14px rgba(255,143,171,0.1)' }}>
+                  <div className="px-4 py-3 bg-pink-50">
+                    <h3 className="text-sm font-bold text-gray-600">✈️ たくさん送った人</h3>
+                  </div>
+                  <div className="p-4">
+                    {!rankingData || rankingData.send_ranking.length === 0
+                      ? <p className="text-xs text-gray-300 text-center py-6">まだデータがありません</p>
+                      : <div className="space-y-2">
+                          {rankingData.send_ranking.map((entry: any, i: number) => (
+                            <div key={entry.user_id}
+                                 className={`flex items-center gap-3 p-2.5 rounded-xl ${i < 3 ? 'bg-pink-50' : 'bg-gray-50'}`}>
+                              <div className="w-7 text-center shrink-0">
+                                {i < 3
+                                  ? <span className="text-xl">{['🥇','🥈','🥉'][i]}</span>
+                                  : <span className="text-sm font-bold text-gray-300">{i + 1}</span>}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-700 truncate">{entry.user_name}さん</p>
+                                {entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="text-lg font-bold text-pink-500">{entry.count}</span>
+                                <span className="text-xs text-gray-400 ml-0.5">件</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                    }
+                  </div>
+                </div>
+
+                {/* 受信ランキング */}
+                <div className="bg-white rounded-2xl overflow-hidden"
+                     style={{ boxShadow: '0 2px 14px rgba(255,143,171,0.1)' }}>
+                  <div className="px-4 py-3 bg-rose-50">
+                    <h3 className="text-sm font-bold text-gray-600">💗 たくさんもらった人</h3>
+                  </div>
+                  <div className="p-4">
+                    {!rankingData || rankingData.receive_ranking.length === 0
+                      ? <p className="text-xs text-gray-300 text-center py-6">まだデータがありません</p>
+                      : <div className="space-y-2">
+                          {rankingData.receive_ranking.map((entry: any, i: number) => (
+                            <div key={entry.user_id}
+                                 className={`flex items-center gap-3 p-2.5 rounded-xl ${i < 3 ? 'bg-rose-50' : 'bg-gray-50'}`}>
+                              <div className="w-7 text-center shrink-0">
+                                {i < 3
+                                  ? <span className="text-xl">{['🥇','🥈','🥉'][i]}</span>
+                                  : <span className="text-sm font-bold text-gray-300">{i + 1}</span>}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm font-semibold text-gray-700 truncate">{entry.user_name}さん</p>
+                                {entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
+                              </div>
+                              <div className="text-right shrink-0">
+                                <span className="text-lg font-bold text-rose-400">{entry.count}</span>
+                                <span className="text-xs text-gray-400 ml-0.5">件</span>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                    }
+                  </div>
+                </div>
+              </div>
             </div>
           )}
 
