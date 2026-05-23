@@ -712,14 +712,21 @@ export default function StaffPage() {
                 </div>
               </div>
 
-              {receivedMessages.length > 0 && (
-                <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(255,143,171,0.1)' }}>
-                  <div className="px-4 py-3 border-b border-pink-50 flex items-center justify-between">
-                    <h3 className="text-xs font-bold text-gray-600">💗 最近もらったありがとう</h3>
+              <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(255,143,171,0.1)' }}>
+                <div className="px-4 py-3 border-b border-pink-50 flex items-center justify-between">
+                  <h3 className="text-xs font-bold text-gray-600">💗 最近もらったありがとう</h3>
+                  {receivedMessages.length > 0 && (
                     <button onClick={() => setNav('received')} className="text-[10px] text-pink-400 hover:text-pink-600">
                       すべて見る →
                     </button>
+                  )}
+                </div>
+                {receivedMessages.length === 0 ? (
+                  <div className="px-4 py-6 text-center">
+                    <p className="text-xs text-gray-300">まだもらったありがとうはありません</p>
+                    <p className="text-[10px] text-gray-200 mt-1">誰かからありがとうが届くのを楽しみに待ちましょう！</p>
                   </div>
+                ) : (
                   <div className="divide-y divide-gray-50">
                     {receivedMessages.slice(0, 5).map(m => (
                       <div key={m.id} className="px-4 py-3">
@@ -731,8 +738,8 @@ export default function StaffPage() {
                       </div>
                     ))}
                   </div>
-                </div>
-              )}
+                )}
+              </div>
             </div>
           )}
 
