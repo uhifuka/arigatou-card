@@ -7,14 +7,14 @@ const JWT_SECRET = new TextEncoder().encode(
   process.env.NEXTAUTH_SECRET || 'fallback-secret-change-in-production'
 );
 const COOKIE_NAME = 'arigatou_session';
-const COOKIE_MAX_AGE = 60 * 60 * 8; // 8時間
+const COOKIE_MAX_AGE = 60 * 60; // 1時間（クライアント側の15分アイドルタイムアウトが主な制御）
 
 // JWTトークンを生成
 export async function createToken(session: AuthSession): Promise<string> {
   return await new SignJWT({ ...session })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
-    .setExpirationTime('8h')
+    .setExpirationTime('1h')
     .sign(JWT_SECRET);
 }
 
