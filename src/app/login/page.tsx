@@ -275,7 +275,7 @@ export default function LoginPage() {
                 type="text"
                 value={loginId}
                 onChange={e => setLoginId(e.target.value)}
-                placeholder="例: ueda001"
+                placeholder="ログインID"
                 required
                 className="w-full px-4 py-3 rounded-2xl border-2 border-pink-100 bg-pink-50/60 text-gray-700 text-sm transition-colors"
               />

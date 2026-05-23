@@ -658,6 +658,7 @@ export default function StaffPage() {
                     <BunnyChar className="w-14 h-14 float-anim"/>
                     <BearChar style={{width:'48px',height:'48px'}}/>
                   </div>
+                </div>
               </div>
 
               {/* 誕生日カード */}
