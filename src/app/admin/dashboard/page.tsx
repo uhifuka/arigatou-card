@@ -49,7 +49,9 @@ function GreenBird() {
       <ellipse cx="25" cy="38" rx="16" ry="18" fill="#81c784"/>
       <circle cx="25" cy="20" r="13" fill="#81c784"/>
       <circle cx="21" cy="18" r="2.5" fill="#3d2b1f"/>
+      <circle cx="29" cy="18" r="2.5" fill="#3d2b1f"/>
       <circle cx="21.5" cy="17" r="0.8" fill="white"/>
+      <circle cx="29.5" cy="17" r="0.8" fill="white"/>
       <polygon points="25,22 22,25 28,25" fill="#ff9800"/>
       <ellipse cx="13" cy="38" rx="5" ry="3" fill="#66bb6a" transform="rotate(-40,13,38)"/>
       <ellipse cx="37" cy="38" rx="5" ry="3" fill="#66bb6a" transform="rotate(40,37,38)"/>
