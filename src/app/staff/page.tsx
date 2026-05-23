@@ -421,6 +421,7 @@ export default function StaffPage() {
   const [pwOpen, setPwOpen] = useState(false);
   const [pwForm, setPwForm] = useState({ current: '', next: '', confirm: '' });
   const [pwSaving, setPwSaving] = useState(false);
+  const [showRankingNames, setShowRankingNames] = useState(false);
 
   useEffect(() => {
     if (!loading && !session) router.push('/login');
@@ -844,9 +845,18 @@ export default function StaffPage() {
           {/* ランキング */}
           {nav === 'ranking' && (
             <div className="max-w-2xl mx-auto space-y-4 fade-slide">
-              <div className="text-center mb-2">
-                <h2 className="text-lg font-bold text-gray-700">🏆 今月のランキング</h2>
-                <p className="text-xs text-gray-400 mt-0.5">ありがとうの送受信 トップ5</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-gray-700">🏆 今月のランキング</h2>
+                  <p className="text-xs text-gray-400 mt-0.5">ありがとうの送受信 トップ5</p>
+                </div>
+                <button onClick={() => setShowRankingNames(v => !v)}
+                        className={`text-xs font-semibold px-3 py-1.5 rounded-xl border transition-all
+                                   ${showRankingNames
+                                     ? 'bg-pink-50 text-pink-500 border-pink-200'
+                                     : 'bg-gray-50 text-gray-400 border-gray-200'}`}>
+                  {showRankingNames ? '👁 名前を隠す' : '👁 名前を表示'}
+                </button>
               </div>
 
               {/* 月選択 */}
@@ -886,8 +896,10 @@ export default function StaffPage() {
                                   : <span className="text-sm font-bold text-gray-300">{i + 1}</span>}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-700 truncate">{entry.user_name}さん</p>
-                                {entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
+                                <p className="text-sm font-semibold text-gray-700 truncate">
+                                  {showRankingNames ? `${entry.user_name}さん` : '●●●さん'}
+                                </p>
+                                {showRankingNames && entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
                               </div>
                               <div className="text-right shrink-0">
                                 <span className="text-lg font-bold text-pink-500">{entry.count}</span>
@@ -919,8 +931,10 @@ export default function StaffPage() {
                                   : <span className="text-sm font-bold text-gray-300">{i + 1}</span>}
                               </div>
                               <div className="flex-1 min-w-0">
-                                <p className="text-sm font-semibold text-gray-700 truncate">{entry.user_name}さん</p>
-                                {entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
+                                <p className="text-sm font-semibold text-gray-700 truncate">
+                                  {showRankingNames ? `${entry.user_name}さん` : '●●●さん'}
+                                </p>
+                                {showRankingNames && entry.department_name && <p className="text-[10px] text-gray-400">{entry.department_name}</p>}
                               </div>
                               <div className="text-right shrink-0">
                                 <span className="text-lg font-bold text-rose-400">{entry.count}</span>
