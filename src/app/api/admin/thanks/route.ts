@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 
     if (search) {
       query = query.or(
-        `sender_name.ilike.%${search}%,receiver_name.ilike.%${search}%,message.ilike.%${search}%`
+        `sender_name.ilike.%${search}%,receiver_name.ilike.%${search}%`
       );
     }
 

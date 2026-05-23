@@ -15,75 +15,87 @@ interface StaffUser {
 
 type NavItem = 'home' | 'send' | 'received' | 'sent' | 'mypage' | 'tree' | 'ranking';
 
-// ===================== 桜の木コンポーネント =====================
+// ===================== かわいい木コンポーネント =====================
 function SakuraTree({ totalCount }: { totalCount: number }) {
-  const maxFlowers = 60;
-  const flowerCount = Math.min(totalCount, maxFlowers);
-  const [visibleFlowers, setVisibleFlowers] = useState(0);
+  const maxHearts = 50;
+  const heartCount = Math.min(totalCount, maxHearts);
+  const [visibleHearts, setVisibleHearts] = useState(0);
 
   useEffect(() => {
-    setVisibleFlowers(0);
-    if (flowerCount === 0) return;
+    setVisibleHearts(0);
+    if (heartCount === 0) return;
     let i = 0;
     const interval = setInterval(() => {
       i++;
-      setVisibleFlowers(i);
-      if (i >= flowerCount) clearInterval(interval);
+      setVisibleHearts(i);
+      if (i >= heartCount) clearInterval(interval);
     }, 40);
     return () => clearInterval(interval);
-  }, [flowerCount]);
+  }, [heartCount]);
 
-  const flowers = Array.from({ length: maxFlowers }, (_, i) => {
-    const angle = (i / maxFlowers) * Math.PI * 6 + i * 0.7;
-    const radius = 28 + (i % 5) * 9 + Math.sin(i * 1.3) * 8;
-    const cx = 80 + Math.cos(angle) * radius * 0.9;
-    const cy = 60 + Math.sin(angle) * radius * 0.55 - i * 0.35;
-    return { cx: Math.max(10, Math.min(150, cx)), cy: Math.max(5, Math.min(100, cy)) };
+  const hearts = Array.from({ length: maxHearts }, (_, i) => {
+    const angle = (i / maxHearts) * Math.PI * 5 + i * 0.85;
+    const radius = 14 + (i % 4) * 8 + Math.sin(i * 1.5) * 5;
+    const cx = 80 + Math.cos(angle) * radius * 0.88;
+    const cy = 57 + Math.sin(angle) * radius * 0.62 - i * 0.17;
+    return { cx: Math.max(44, Math.min(116, cx)), cy: Math.max(18, Math.min(83, cy)) };
   });
 
   return (
     <div className="flex flex-col items-center py-3">
       <div className="relative">
-        <svg viewBox="0 0 160 140" width="150" height="130">
-          <path d="M78 138 Q75 120 72 105 Q68 90 70 80" stroke="#a0785a" strokeWidth="5" fill="none" strokeLinecap="round"/>
-          <path d="M82 138 Q85 120 88 105 Q92 90 90 80" stroke="#a0785a" strokeWidth="5" fill="none" strokeLinecap="round"/>
-          <path d="M78 100 Q60 85 45 75" stroke="#8b6347" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          <path d="M80 90 Q95 75 110 68" stroke="#8b6347" strokeWidth="3" fill="none" strokeLinecap="round"/>
-          <path d="M79 108 Q65 98 55 92" stroke="#8b6347" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <path d="M81 95 Q93 87 100 82" stroke="#8b6347" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <path d="M79 85 Q80 70 80 60" stroke="#8b6347" strokeWidth="2.5" fill="none" strokeLinecap="round"/>
-          <ellipse cx="80" cy="58" rx="42" ry="30" fill="#c8e6c0" opacity="0.6"/>
-          <ellipse cx="55" cy="72" rx="22" ry="15" fill="#b8ddb0" opacity="0.5"/>
-          <ellipse cx="108" cy="68" rx="20" ry="14" fill="#b8ddb0" opacity="0.5"/>
-          {flowers.map((pos, i) => (
-            <g key={i} style={{
-              opacity: i < visibleFlowers ? 1 : 0,
-              transform: i < visibleFlowers ? 'scale(1)' : 'scale(0)',
-              transformOrigin: `${pos.cx}px ${pos.cy}px`,
-              transition: `opacity 0.3s ease ${i * 0.02}s, transform 0.3s ease ${i * 0.02}s`,
-            }}>
-              {[0,1,2,3,4].map(p => (
-                <ellipse key={p}
-                  cx={pos.cx + Math.cos(p * Math.PI * 2 / 5) * 3.5}
-                  cy={pos.cy + Math.sin(p * Math.PI * 2 / 5) * 3.5}
-                  rx="3" ry="2"
-                  fill={i % 3 === 0 ? '#ffb7c5' : i % 3 === 1 ? '#ff8fab' : '#ffc8d3'}
-                  transform={`rotate(${p * 72 + 30}, ${pos.cx + Math.cos(p * Math.PI * 2 / 5) * 3.5}, ${pos.cy + Math.sin(p * Math.PI * 2 / 5) * 3.5})`}
-                />
-              ))}
-              <circle cx={pos.cx} cy={pos.cy} r="1.5" fill="#fff5f7"/>
-              <circle cx={pos.cx} cy={pos.cy} r="0.8" fill="#ffb7c5"/>
-            </g>
-          ))}
+        <svg viewBox="0 0 160 148" width="150" height="135">
+          {/* 地面の影 */}
+          <ellipse cx="80" cy="143" rx="30" ry="5" fill="#b8903a" opacity="0.2"/>
+          {/* 草 */}
+          <ellipse cx="52" cy="141" rx="9" ry="5" fill="#72b872"/>
+          <ellipse cx="67" cy="139" rx="7" ry="4" fill="#82c882"/>
+          <ellipse cx="80" cy="139" rx="11" ry="5" fill="#82c882"/>
+          <ellipse cx="93" cy="139" rx="7" ry="4" fill="#72b872"/>
+          <ellipse cx="108" cy="141" rx="9" ry="5" fill="#72b872"/>
+          {/* 幹 */}
+          <path d="M70 142 Q68 118 70 104 Q74 91 80 88 Q86 91 90 104 Q92 118 90 142 Z" fill="#9b7040"/>
+          <path d="M73 142 Q72 120 73 108 Q76 98 80 95" stroke="#b88c5a" strokeWidth="1.2" fill="none" strokeLinecap="round" opacity="0.5"/>
+          {/* ほっぺ */}
+          <ellipse cx="72" cy="122" rx="5" ry="4" fill="#ffb3c9" opacity="0.6"/>
+          <ellipse cx="88" cy="122" rx="5" ry="4" fill="#ffb3c9" opacity="0.6"/>
+          {/* 目 */}
+          <ellipse cx="75.5" cy="115" rx="2.5" ry="3" fill="#2d1e0e"/>
+          <ellipse cx="84.5" cy="115" rx="2.5" ry="3" fill="#2d1e0e"/>
+          <circle cx="76.2" cy="113.5" r="0.9" fill="white"/>
+          <circle cx="85.2" cy="113.5" r="0.9" fill="white"/>
+          {/* 口 */}
+          <path d="M75 123 Q80 128 85 123" stroke="#2d1e0e" strokeWidth="1.2" fill="none" strokeLinecap="round"/>
+          {/* キャノピー (3つの重なる円) */}
+          <circle cx="57" cy="75" r="26" fill="#4daa4d"/>
+          <circle cx="103" cy="75" r="26" fill="#4daa4d"/>
+          <circle cx="80" cy="57" r="30" fill="#5cbd5c"/>
+          {/* ハイライト */}
+          <circle cx="68" cy="46" r="9" fill="#7add7a" opacity="0.45"/>
+          {/* ハート (感謝の数だけ増える) */}
+          {hearts.map((pos, i) => {
+            const visible = i < visibleHearts;
+            const colors = ['#ff6b9d','#ff8fab','#ff4d88','#ffb3c9'];
+            const color = colors[i % 4];
+            const s = 0.55 + (i % 3) * 0.12;
+            return (
+              <g key={i} transform={`translate(${pos.cx},${pos.cy})`}
+                 style={{ opacity: visible ? 1 : 0, transition: `opacity 0.3s ease ${i * 0.02}s` }}>
+                <path transform={`scale(${s})`}
+                      d="M0,-4 C-1,-8 -8,-7 -8,-2 C-8,2 -4,5 0,9 C4,5 8,2 8,-2 C8,-7 1,-8 0,-4 Z"
+                      fill={color}/>
+              </g>
+            );
+          })}
         </svg>
         <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 whitespace-nowrap">
           <span className="text-[10px] font-bold text-rose-400 bg-white rounded-full px-2 py-0.5 shadow-sm border border-rose-100">
-            🌸 {totalCount}件
+            💗 {totalCount}件
           </span>
         </div>
       </div>
       <p className="text-[10px] text-gray-400 mt-4 text-center leading-tight">
-        みんなの感謝が<br/>木を咲かせています
+        みんなの感謝が<br/>木を育てています
       </p>
     </div>
   );
@@ -334,48 +346,41 @@ function SeasonalTree({ month, count }: { month: number; count: number }) {
   const positions = useMemo(() =>
     Array.from({ length: MAX }, (_, i) => {
       const angle = (i / MAX) * Math.PI * 8 + i * 0.72;
-      const r = 35 + (i % 6) * 11 + Math.sin(i * 1.5) * 10;
+      const r = 32 + (i % 6) * 10 + Math.sin(i * 1.5) * 9;
       const cx = 140 + Math.cos(angle) * r;
-      const cy = 98 + Math.sin(angle) * r * 0.6 - i * 0.28;
-      return { cx: Math.max(22, Math.min(258, cx)), cy: Math.max(14, Math.min(178, cy)) };
+      const cy = 103 + Math.sin(angle) * r * 0.62 - i * 0.25;
+      return { cx: Math.max(52, Math.min(228, cx)), cy: Math.max(28, Math.min(168, cy)) };
     }), [MAX]);
-
-  const hasLeaves = cfg.leafColor !== 'transparent';
-  const isSnow = month === 12;
 
   return (
     <svg viewBox="0 0 280 300" className="w-full" style={{ maxHeight: 380 }}>
-      {/* 雪 (12月) */}
-      {isSnow && [
-        [40,20],[90,10],[160,18],[220,8],[250,25],[70,40],[190,35],[130,5],
-      ].map(([sx,sy],k) => (
-        <circle key={k} cx={sx} cy={sy} r={k%2===0?3:2} fill="white" opacity="0.8"/>
-      ))}
-
-      {/* 葉のキャノピー */}
-      {hasLeaves && <>
-        <ellipse cx="140" cy="98" rx="85" ry="58" fill={cfg.leafColor} opacity="0.55"/>
-        <ellipse cx="82" cy="132" rx="40" ry="27" fill={cfg.leafColor} opacity="0.45"/>
-        <ellipse cx="198" cy="124" rx="37" ry="25" fill={cfg.leafColor} opacity="0.45"/>
-        <ellipse cx="140" cy="74" rx="48" ry="35" fill={cfg.leafColor} opacity="0.4"/>
-      </>}
-
+      {/* 地面の影 */}
+      <ellipse cx="140" cy="292" rx="55" ry="9" fill="#b8903a" opacity="0.18"/>
+      {/* 草 */}
+      <ellipse cx="80" cy="286" rx="18" ry="9" fill="#6ab56a"/>
+      <ellipse cx="108" cy="283" rx="14" ry="8" fill="#78c278"/>
+      <ellipse cx="140" cy="282" rx="20" ry="9" fill="#78c278"/>
+      <ellipse cx="172" cy="283" rx="14" ry="8" fill="#6ab56a"/>
+      <ellipse cx="200" cy="286" rx="18" ry="9" fill="#6ab56a"/>
       {/* 幹 */}
-      <ellipse cx="140" cy="295" rx="26" ry="7" fill="#c4a882" opacity="0.55"/>
-      <path d="M133 295 Q130 268 128 244 Q125 220 128 200 Q130 183 133 170" stroke="#8B6347" strokeWidth="9" fill="none" strokeLinecap="round"/>
-      <path d="M147 295 Q150 268 152 244 Q155 220 152 200 Q150 183 147 170" stroke="#8B6347" strokeWidth="9" fill="none" strokeLinecap="round"/>
-
-      {/* 枝 */}
-      <path d="M133 182 Q108 165 80 150" stroke="#9B7050" strokeWidth="6.5" fill="none" strokeLinecap="round"/>
-      <path d="M147 174 Q172 158 200 146" stroke="#9B7050" strokeWidth="6.5" fill="none" strokeLinecap="round"/>
-      <path d="M138 178 Q133 150 129 126" stroke="#a07858" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-      <path d="M142 172 Q148 144 153 120" stroke="#a07858" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-      <path d="M106 166 Q94 148 88 132" stroke="#b08868" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-      <path d="M174 158 Q186 140 192 124" stroke="#b08868" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-      <path d="M130 132 Q127 118 125 106" stroke="#b08868" strokeWidth="3" fill="none" strokeLinecap="round"/>
-      <path d="M152 125 Q156 112 158 100" stroke="#b08868" strokeWidth="3" fill="none" strokeLinecap="round"/>
-      <path d="M140 174 Q138 145 137 118" stroke="#b08868" strokeWidth="3" fill="none" strokeLinecap="round"/>
-
+      <path d="M122 287 Q119 252 121 220 Q126 194 140 188 Q154 194 159 220 Q161 252 158 287 Z" fill="#9b7040"/>
+      <path d="M129 287 Q127 254 129 224 Q134 202 140 196" stroke="#b88c5a" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
+      {/* ほっぺ */}
+      <ellipse cx="128" cy="248" rx="11" ry="9" fill="#ffb3c9" opacity="0.55"/>
+      <ellipse cx="152" cy="248" rx="11" ry="9" fill="#ffb3c9" opacity="0.55"/>
+      {/* 目 */}
+      <ellipse cx="133" cy="233" rx="5.5" ry="6.5" fill="#2d1e0e"/>
+      <ellipse cx="147" cy="233" rx="5.5" ry="6.5" fill="#2d1e0e"/>
+      <circle cx="135" cy="230" r="2" fill="white"/>
+      <circle cx="149" cy="230" r="2" fill="white"/>
+      {/* 口 */}
+      <path d="M133 248 Q140 255 147 248" stroke="#2d1e0e" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      {/* キャノピー (3つの重なる円) */}
+      <circle cx="90" cy="126" r="58" fill="#4daa4d"/>
+      <circle cx="190" cy="126" r="58" fill="#4daa4d"/>
+      <circle cx="140" cy="96" r="65" fill="#5cbd5c"/>
+      {/* ハイライト */}
+      <circle cx="113" cy="76" r="20" fill="#7add7a" opacity="0.4"/>
       {/* 花・実・葉 */}
       {positions.map((pos, i) => {
         const isVis = i < visible;

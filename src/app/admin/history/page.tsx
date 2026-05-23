@@ -72,7 +72,7 @@ export default function HistoryPage() {
           <div>
             <label className="text-xs font-semibold text-gray-400 block mb-1.5">フリー検索</label>
             <input value={search} onChange={e => setSearch(e.target.value)}
-                   placeholder="名前・メッセージ..."
+                   placeholder="名前で検索..."
                    className="w-full px-3 py-2 rounded-xl border border-gray-200 text-sm text-gray-700
                               focus:outline-none focus:border-rose-300 transition-colors" />
           </div>
@@ -104,7 +104,6 @@ export default function HistoryPage() {
                       <th className="text-left px-4 py-3 font-semibold">日付</th>
                       <th className="text-left px-4 py-3 font-semibold">送った人</th>
                       <th className="text-left px-4 py-3 font-semibold">受け取った人</th>
-                      <th className="text-left px-4 py-3 font-semibold">メッセージ</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -118,9 +117,6 @@ export default function HistoryPage() {
                         </td>
                         <td className="px-4 py-3 text-rose-500 font-medium whitespace-nowrap">
                           {m.receiver_name}
-                        </td>
-                        <td className="px-4 py-3 text-gray-600 max-w-xs">
-                          <p className="truncate">{m.message}</p>
                         </td>
                       </tr>
                     ))}
