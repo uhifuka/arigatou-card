@@ -17,7 +17,7 @@ export async function PUT(req: NextRequest, { params }: { params: { id: string }
     if (role !== undefined) updates.role = role;
     if (department_id !== undefined) updates.department_id = department_id || null;
     if (is_active !== undefined) updates.is_active = is_active;
-    if (birthday !== undefined) updates.birthday = birthday || null;
+    if (birthday) updates.birthday = birthday;
     if (password) {
       updates.password_hash = await bcrypt.hash(password, 10);
     }

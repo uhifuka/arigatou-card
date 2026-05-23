@@ -44,9 +44,12 @@ export async function POST(req: NextRequest) {
 
     const password_hash = await bcrypt.hash(password, 10);
 
+    const insertData: Record<string, unknown> = { login_id, name, password_hash, role: role || 'staff', department_id: department_id || null };
+    if (birthday) insertData.birthday = birthday;
+
     const { data, error } = await supabaseAdmin
       .from('users')
-      .insert({ login_id, name, password_hash, role: role || 'staff', department_id: department_id || null, birthday: birthday || null })
+      .insert(insertData)
       .select('id, login_id, name, role')
       .single();
 
