@@ -583,16 +583,16 @@ export default function StaffPage() {
                       ✈️ ありがとうを送る
                     </button>
                   </div>
-                  <div className="flex items-end gap-1 ml-2">
-                    <BunnyChar className="w-16 h-16 float-anim"/>
-                    <BearChar className="w-13 h-13 float-slow" style={{width:'52px',height:'52px'}}/>
+                  <div className="flex flex-col items-end ml-2 shrink-0">
+                    <div className="bg-white/80 backdrop-blur-sm rounded-2xl px-3 py-2 text-[10px] text-pink-400 font-bold leading-snug shadow-sm mb-1"
+                         style={{ transform: 'rotate(-2deg)' }}>
+                      いつも<br/>ありがとう<br/>ございます！
+                    </div>
+                    <div className="flex items-end gap-1">
+                      <BunnyChar className="w-16 h-16 float-anim"/>
+                      <BearChar className="w-13 h-13 float-slow" style={{width:'52px',height:'52px'}}/>
+                    </div>
                   </div>
-                </div>
-                {/* 吹き出し */}
-                <div className="absolute top-3 right-4 bg-white/80 backdrop-blur-sm rounded-2xl px-3 py-2 text-[10px] text-pink-400 font-bold leading-snug shadow-sm"
-                     style={{ transform: 'rotate(-2deg)' }}>
-                  いつも<br/>ありがとう<br/>ございます！
-                </div>
               </div>
 
               {/* 統計 */}
