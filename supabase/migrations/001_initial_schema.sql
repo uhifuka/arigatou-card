@@ -51,7 +51,6 @@ CREATE TABLE thanks_messages (
 CREATE INDEX idx_thanks_sender ON thanks_messages(sender_id);
 CREATE INDEX idx_thanks_receiver ON thanks_messages(receiver_id);
 CREATE INDEX idx_thanks_sent_date ON thanks_messages(sent_date);
-CREATE INDEX idx_thanks_year_month ON thanks_messages(DATE_TRUNC('month', sent_date));
 CREATE INDEX idx_users_login_id ON users(login_id);
 CREATE INDEX idx_users_role ON users(role);
 
