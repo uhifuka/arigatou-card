@@ -24,7 +24,7 @@ export async function GET(req: NextRequest) {
     // 月別集計（全件取得してJSでフィルタ）
     const { data: monthlyRaw, error: monthlyError } = await supabaseAdmin
       .from('thanks_messages')
-      .select('sent_date');
+      .select('sent_date, sender_id');
 
     if (monthlyError) throw monthlyError;
 
@@ -37,11 +37,17 @@ export async function GET(req: NextRequest) {
       })
     );
 
+    const currentMonthStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const monthlyMap: Record<string, number> = {};
-    monthlyRaw?.forEach(({ sent_date }) => {
+    const thisMonthSenders = new Set<string>();
+
+    monthlyRaw?.forEach(({ sent_date, sender_id }) => {
       if (!sent_date) return;
-      const month = String(sent_date).substring(0, 7); // YYYY-MM
+      const month = String(sent_date).substring(0, 7);
       monthlyMap[month] = (monthlyMap[month] || 0) + 1;
+      if (month === currentMonthStr && sender_id) {
+        thisMonthSenders.add(sender_id);
+      }
     });
 
     const monthlyStats = Object.entries(monthlyMap)
@@ -49,14 +55,17 @@ export async function GET(req: NextRequest) {
       .sort(([a], [b]) => a.localeCompare(b))
       .map(([month, count]) => ({ month, total_count: count }));
 
-    // 全体の合計はuser_statsのsend_countの総計
     const totalCount = (userStats || []).reduce((s, u) => s + (u.send_count || 0), 0);
+    const monthlyActiveSenders = thisMonthSenders.size;
+    const totalStaff = (userStats || []).length;
 
     return NextResponse.json({
       data: {
         monthly_stats: monthlyStats,
         user_stats: userStats,
         total_count: totalCount,
+        monthly_active_senders: monthlyActiveSenders,
+        total_staff: totalStaff,
       },
     });
   } catch (err) {

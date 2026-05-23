@@ -12,6 +12,8 @@ interface StatsData {
   monthly_stats: MonthlyStats[];
   user_stats: UserStats[];
   total_count: number;
+  monthly_active_senders: number;
+  total_staff: number;
 }
 
 // ===== かわいいキャラ =====
@@ -107,12 +109,14 @@ export default function DashboardPage() {
   const currentMonthCount = monthlyData[monthlyData.length - 1]?.total_count || 0;
   const prevMonthCount = monthlyData[monthlyData.length - 2]?.total_count || 0;
 
-  const totalReceive = stats?.user_stats.reduce((s, u) => s + u.receive_count, 0) || 0;
-  const totalSend = stats?.user_stats.reduce((s, u) => s + u.send_count, 0) || 0;
+  const activeSenders = stats?.monthly_active_senders || 0;
+  const totalStaff = stats?.total_staff || 0;
+  const notSent = Math.max(0, totalStaff - activeSenders);
+  const participationRate = totalStaff > 0 ? Math.round((activeSenders / totalStaff) * 100) : 0;
 
   const pieData = [
-    { name: 'もらったありがとう', value: totalReceive },
-    { name: '送ったありがとう', value: totalSend },
+    { name: '送信済み', value: activeSenders },
+    { name: 'まだ送っていない', value: notSent || (totalStaff === 0 ? 1 : 0) },
   ];
 
   return (
@@ -186,23 +190,28 @@ export default function DashboardPage() {
           </ResponsiveContainer>
         </div>
 
-        {/* ドーナツ円グラフ */}
+        {/* 参加率ドーナツ */}
         <div className="bg-white rounded-2xl p-4" style={{ boxShadow: '0 2px 16px rgba(255,143,171,0.1)' }}>
-          <h2 className="text-sm font-bold text-gray-600 mb-1">ありがとうの内訳（今月）</h2>
-          <ResponsiveContainer width="100%" height={200}>
-            <PieChart>
-              <Pie data={pieData} cx="50%" cy="50%"
-                   innerRadius={50} outerRadius={80}
-                   dataKey="value" paddingAngle={3}>
-                <Cell fill="#ffb3c9"/>
-                <Cell fill="#b3d4ff"/>
-              </Pie>
-              <Tooltip formatter={(v, name) => [`${v}件 (${Math.round(Number(v)/(totalReceive+totalSend||1)*100)}%)`, name]}/>
-            </PieChart>
-          </ResponsiveContainer>
+          <h2 className="text-sm font-bold text-gray-600 mb-1">今月の参加率</h2>
+          <div className="relative">
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie data={pieData} cx="50%" cy="50%"
+                     innerRadius={52} outerRadius={80}
+                     dataKey="value" paddingAngle={2} startAngle={90} endAngle={-270}>
+                  <Cell fill="#ff8fab"/>
+                  <Cell fill="#f0f0f0"/>
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+              <p className="text-2xl font-bold text-pink-500">{participationRate}%</p>
+              <p className="text-[10px] text-gray-400">{activeSenders}/{totalStaff}人</p>
+            </div>
+          </div>
           <div className="flex justify-center gap-4 text-xs text-gray-500">
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#ffb3c9'}}/> もらったありがとう {totalReceive}件</span>
-            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#b3d4ff'}}/> 送ったありがとう {totalSend}件</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#ff8fab'}}/> 送信済み {activeSenders}人</span>
+            <span className="flex items-center gap-1"><span className="w-3 h-3 rounded-full inline-block" style={{background:'#f0f0f0'}}/> まだ送っていない {notSent}人</span>
           </div>
         </div>
       </div>
