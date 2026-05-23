@@ -148,16 +148,16 @@ export default function DashboardPage() {
           badge={<GrowthBadge value={currentMonthCount} prev={prevMonthCount}/>}
         />
         <KpiCard
-          label="もらったありがとう数（今月）"
-          value={totalReceive > 0 ? Math.round(totalReceive / Math.max(monthlyData.length, 1)) : currentMonthCount}
+          label="先月のありがとう数"
+          value={prevMonthCount}
           color="#e85d6a"
-          badge={<span className="text-[10px] text-pink-300">今月推定</span>}
+          badge={<GrowthBadge value={currentMonthCount} prev={prevMonthCount}/>}
         />
         <KpiCard
-          label="送ったありがとう数（今月）"
-          value={totalSend > 0 ? Math.round(totalSend / Math.max(monthlyData.length, 1)) : currentMonthCount}
+          label="ありがとう累計"
+          value={stats?.total_count || 0}
           color="#5c8ae8"
-          badge={<span className="text-[10px] text-blue-300">今月推定</span>}
+          badge={<span className="text-[10px] text-blue-300">全期間</span>}
         />
       </div>
 
