@@ -68,8 +68,6 @@ function LoginSeasonalTree({ month, count }: { month: number; count: number }) {
   const MAX = 30;
   const display = Math.min(count, MAX);
   const [visible, setVisible] = useState(0);
-  const cfg = MONTH_CFG[month - 1];
-  const hasLeaves = cfg.leafColor !== 'transparent';
 
   useEffect(() => {
     setVisible(0);
@@ -82,28 +80,42 @@ function LoginSeasonalTree({ month, count }: { month: number; count: number }) {
   const positions = useMemo(() =>
     Array.from({ length: MAX }, (_, i) => {
       const angle = (i / MAX) * Math.PI * 8 + i * 0.72;
-      const r = 35 + (i % 6) * 11 + Math.sin(i * 1.5) * 10;
+      const r = 32 + (i % 6) * 10 + Math.sin(i * 1.5) * 9;
       const cx = 140 + Math.cos(angle) * r;
-      const cy = 98 + Math.sin(angle) * r * 0.6 - i * 0.28;
-      return { cx: Math.max(22, Math.min(258, cx)), cy: Math.max(14, Math.min(178, cy)) };
+      const cy = 103 + Math.sin(angle) * r * 0.62 - i * 0.25;
+      return { cx: Math.max(52, Math.min(228, cx)), cy: Math.max(28, Math.min(168, cy)) };
     }), []);
 
   return (
     <svg viewBox="0 0 280 300" className="w-full" style={{ maxHeight: 220 }}>
-      {hasLeaves && <>
-        <ellipse cx="140" cy="98" rx="85" ry="58" fill={cfg.leafColor} opacity="0.55"/>
-        <ellipse cx="82" cy="132" rx="40" ry="27" fill={cfg.leafColor} opacity="0.45"/>
-        <ellipse cx="198" cy="124" rx="37" ry="25" fill={cfg.leafColor} opacity="0.45"/>
-      </>}
-      <ellipse cx="140" cy="295" rx="26" ry="7" fill="#c4a882" opacity="0.55"/>
-      <path d="M133 295 Q130 268 128 244 Q125 220 128 200 Q130 183 133 170" stroke="#8B6347" strokeWidth="9" fill="none" strokeLinecap="round"/>
-      <path d="M147 295 Q150 268 152 244 Q155 220 152 200 Q150 183 147 170" stroke="#8B6347" strokeWidth="9" fill="none" strokeLinecap="round"/>
-      <path d="M133 182 Q108 165 80 150" stroke="#9B7050" strokeWidth="6.5" fill="none" strokeLinecap="round"/>
-      <path d="M147 174 Q172 158 200 146" stroke="#9B7050" strokeWidth="6.5" fill="none" strokeLinecap="round"/>
-      <path d="M138 178 Q133 150 129 126" stroke="#a07858" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-      <path d="M142 172 Q148 144 153 120" stroke="#a07858" strokeWidth="4.5" fill="none" strokeLinecap="round"/>
-      <path d="M106 166 Q94 148 88 132" stroke="#b08868" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
-      <path d="M174 158 Q186 140 192 124" stroke="#b08868" strokeWidth="3.5" fill="none" strokeLinecap="round"/>
+      {/* 地面の影 */}
+      <ellipse cx="140" cy="292" rx="55" ry="9" fill="#b8903a" opacity="0.18"/>
+      {/* 草 */}
+      <ellipse cx="80" cy="286" rx="18" ry="9" fill="#6ab56a"/>
+      <ellipse cx="108" cy="283" rx="14" ry="8" fill="#78c278"/>
+      <ellipse cx="140" cy="282" rx="20" ry="9" fill="#78c278"/>
+      <ellipse cx="172" cy="283" rx="14" ry="8" fill="#6ab56a"/>
+      <ellipse cx="200" cy="286" rx="18" ry="9" fill="#6ab56a"/>
+      {/* 幹 */}
+      <path d="M122 287 Q119 252 121 220 Q126 194 140 188 Q154 194 159 220 Q161 252 158 287 Z" fill="#9b7040"/>
+      <path d="M129 287 Q127 254 129 224 Q134 202 140 196" stroke="#b88c5a" strokeWidth="2" fill="none" strokeLinecap="round" opacity="0.5"/>
+      {/* ほっぺ */}
+      <ellipse cx="128" cy="248" rx="11" ry="9" fill="#ffb3c9" opacity="0.55"/>
+      <ellipse cx="152" cy="248" rx="11" ry="9" fill="#ffb3c9" opacity="0.55"/>
+      {/* 目 */}
+      <ellipse cx="133" cy="233" rx="5.5" ry="6.5" fill="#2d1e0e"/>
+      <ellipse cx="147" cy="233" rx="5.5" ry="6.5" fill="#2d1e0e"/>
+      <circle cx="135" cy="230" r="2" fill="white"/>
+      <circle cx="149" cy="230" r="2" fill="white"/>
+      {/* 口 */}
+      <path d="M133 248 Q140 255 147 248" stroke="#2d1e0e" strokeWidth="2" fill="none" strokeLinecap="round"/>
+      {/* キャノピー (3つの重なる円) */}
+      <circle cx="90" cy="126" r="58" fill="#4daa4d"/>
+      <circle cx="190" cy="126" r="58" fill="#4daa4d"/>
+      <circle cx="140" cy="96" r="65" fill="#5cbd5c"/>
+      {/* ハイライト */}
+      <circle cx="113" cy="76" r="20" fill="#7add7a" opacity="0.4"/>
+      {/* 花・実・葉 */}
       {positions.map((pos, i) => (
         <g key={i} style={{
           opacity: i < visible ? 1 : 0,
