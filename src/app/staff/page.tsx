@@ -712,21 +712,25 @@ export default function StaffPage() {
                 </div>
               </div>
 
-              {receivedMessages.slice(0, 3).length > 0 && (
-                <div className="bg-white rounded-2xl p-4" style={{ boxShadow: '0 2px 12px rgba(255,143,171,0.1)' }}>
-                  <h3 className="text-xs font-bold text-gray-500 mb-3">💗 最近もらったありがとう</h3>
-                  <div className="space-y-2">
-                    {receivedMessages.slice(0, 3).map(m => (
-                      <div key={m.id} className="flex items-start gap-2 text-xs">
-                        <span className="text-gray-300 shrink-0 w-12">{m.sent_date.substring(5).replace('-','/')}</span>
-                        <span className="font-medium text-gray-600 shrink-0 w-16 truncate">{m.sender_name}さん</span>
-                        <span className="text-gray-400 truncate">{m.message}</span>
+              {receivedMessages.length > 0 && (
+                <div className="bg-white rounded-2xl overflow-hidden" style={{ boxShadow: '0 2px 12px rgba(255,143,171,0.1)' }}>
+                  <div className="px-4 py-3 border-b border-pink-50 flex items-center justify-between">
+                    <h3 className="text-xs font-bold text-gray-600">💗 最近もらったありがとう</h3>
+                    <button onClick={() => setNav('received')} className="text-[10px] text-pink-400 hover:text-pink-600">
+                      すべて見る →
+                    </button>
+                  </div>
+                  <div className="divide-y divide-gray-50">
+                    {receivedMessages.slice(0, 5).map(m => (
+                      <div key={m.id} className="px-4 py-3">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-xs font-bold text-pink-500">{m.sender_name}さんから</span>
+                          <span className="text-[10px] text-gray-300 ml-auto">{m.sent_date.substring(5).replace('-','/')}</span>
+                        </div>
+                        <p className="text-xs text-gray-500 leading-relaxed">{m.message}</p>
                       </div>
                     ))}
                   </div>
-                  <button onClick={() => setNav('received')} className="text-xs text-pink-400 mt-2 hover:text-pink-600">
-                    もっと見る →
-                  </button>
                 </div>
               )}
             </div>
