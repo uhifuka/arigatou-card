@@ -12,7 +12,7 @@ export async function GET(req: NextRequest) {
   const { data, error } = await supabaseAdmin
     .from('user_stats')
     .select('*')
-    .order('name');
+    .order('login_id');
 
   if (error) return NextResponse.json({ error: 'データ取得に失敗しました' }, { status: 500 });
   return NextResponse.json({ data });
