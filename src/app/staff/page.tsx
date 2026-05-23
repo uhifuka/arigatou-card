@@ -422,6 +422,8 @@ export default function StaffPage() {
       if (res.ok) {
         const { data } = await res.json();
         setTreeData(data || {});
+        const total = Object.values((data || {}) as Record<string, number>).reduce((sum, n) => sum + n, 0);
+        setTotalCount(total);
       }
     } catch {}
   }, []);
@@ -435,14 +437,6 @@ export default function StaffPage() {
     if (staffRes.ok) setStaffList((await staffRes.json()).data || []);
     if (sentRes.ok) setSentMessages((await sentRes.json()).data || []);
     if (receivedRes.ok) setReceivedMessages((await receivedRes.json()).data || []);
-    // 統計（管理者でなくても取れる簡易版）
-    try {
-      const statsRes = await fetch('/api/admin/stats');
-      if (statsRes.ok) {
-        const { data } = await statsRes.json();
-        setTotalCount(data?.total_count || 0);
-      }
-    } catch {}
   }, []);
 
   useEffect(() => { if (session) { fetchData(); fetchTreeData(); } }, [session, fetchData, fetchTreeData]);
