@@ -13,26 +13,7 @@ export async function GET(req: NextRequest) {
   }
 
   try {
-    // 月別集計（過去12ヶ月）
-    const { data: monthlyRaw, error: monthlyError } = await supabaseAdmin
-      .from('thanks_messages')
-      .select('sent_date')
-      .gte('sent_date', new Date(new Date().setMonth(new Date().getMonth() - 11)).toISOString().split('T')[0]);
-
-    if (monthlyError) throw monthlyError;
-
-    // JavaScriptで月別集計
-    const monthlyMap: Record<string, number> = {};
-    monthlyRaw?.forEach(({ sent_date }) => {
-      const month = sent_date.substring(0, 7); // YYYY-MM
-      monthlyMap[month] = (monthlyMap[month] || 0) + 1;
-    });
-
-    const monthlyStats = Object.entries(monthlyMap)
-      .sort(([a], [b]) => a.localeCompare(b))
-      .map(([month, count]) => ({ month, total_count: count }));
-
-    // ユーザー別統計
+    // ユーザー別統計（先に取得）
     const { data: userStats, error: userError } = await supabaseAdmin
       .from('user_stats')
       .select('*')
@@ -40,16 +21,42 @@ export async function GET(req: NextRequest) {
 
     if (userError) throw userError;
 
-    // 全体の合計
-    const { count: totalCount } = await supabaseAdmin
+    // 月別集計（全件取得してJSでフィルタ）
+    const { data: monthlyRaw, error: monthlyError } = await supabaseAdmin
       .from('thanks_messages')
-      .select('*', { count: 'exact', head: true });
+      .select('sent_date');
+
+    if (monthlyError) throw monthlyError;
+
+    // 過去12ヶ月のセット
+    const now = new Date();
+    const past12Months = new Set(
+      Array.from({ length: 12 }, (_, i) => {
+        const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+      })
+    );
+
+    const monthlyMap: Record<string, number> = {};
+    monthlyRaw?.forEach(({ sent_date }) => {
+      if (!sent_date) return;
+      const month = String(sent_date).substring(0, 7); // YYYY-MM
+      monthlyMap[month] = (monthlyMap[month] || 0) + 1;
+    });
+
+    const monthlyStats = Object.entries(monthlyMap)
+      .filter(([month]) => past12Months.has(month))
+      .sort(([a], [b]) => a.localeCompare(b))
+      .map(([month, count]) => ({ month, total_count: count }));
+
+    // 全体の合計はuser_statsのsend_countの総計
+    const totalCount = (userStats || []).reduce((s, u) => s + (u.send_count || 0), 0);
 
     return NextResponse.json({
       data: {
         monthly_stats: monthlyStats,
         user_stats: userStats,
-        total_count: totalCount || 0,
+        total_count: totalCount,
       },
     });
   } catch (err) {
