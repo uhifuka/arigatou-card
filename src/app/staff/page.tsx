@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback, useMemo } from 'react';
+import { useState, useEffect, useCallback, useMemo, type CSSProperties } from 'react';
 import { useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 import { useAuth } from '@/hooks/useAuth';
@@ -112,9 +112,9 @@ function BunnyChar({ className = '' }: { className?: string }) {
   );
 }
 
-function BearChar({ className = '' }: { className?: string }) {
+function BearChar({ className = '', style }: { className?: string; style?: CSSProperties }) {
   return (
-    <svg viewBox="0 0 80 95" className={className}>
+    <svg viewBox="0 0 80 95" className={className} style={style}>
       <circle cx="22" cy="30" r="12" fill="#d4956a"/>
       <circle cx="58" cy="30" r="12" fill="#d4956a"/>
       <circle cx="22" cy="29" r="8" fill="#c4855a"/>
