@@ -24,3 +24,8 @@ next-env.d.ts
 
 # Claude Code ローカル設定（個人設定のためコミットしない）
 .claude/settings.local.json
+
+# 機密ファイル
+*.docx
+*.xlsx
+*.pdf
