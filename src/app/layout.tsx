@@ -12,20 +12,8 @@ const notoSans = Noto_Sans_JP({
 export const metadata: Metadata = {
   title: 'ありがとうカード | 上田皮ふ科',
   description: 'スタッフ同士で感謝を伝えるシステム',
-  appleWebApp: {
-    capable: true,
-    title: 'ありがとう',
-    statusBarStyle: 'default',
-  },
   formatDetection: {
     telephone: false,
-  },
-  icons: {
-    apple: '/apple-touch-icon.png',
-    icon: [
-      { url: '/favicon.png', sizes: '32x32', type: 'image/png' },
-      { url: '/icon-192.png', sizes: '192x192', type: 'image/png' },
-    ],
   },
 };
 
@@ -40,6 +28,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
+      <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-title" content="ありがとう" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" sizes="32x32" href="/favicon.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+      </head>
       <body className={notoSans.className}>
         {children}
         <Toaster
