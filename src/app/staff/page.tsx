@@ -414,6 +414,7 @@ export default function StaffPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [treeData, setTreeData] = useState<Record<string, number>>({});
   const [selectedMonth, setSelectedMonth] = useState(() => new Date().getMonth() + 1);
+  const [selectedYear, setSelectedYear] = useState(() => new Date().getFullYear());
   const [rankingData, setRankingData] = useState<{ send_ranking: any[]; receive_ranking: any[] } | null>(null);
   const [rankingMonth, setRankingMonth] = useState(() => new Date().toISOString().substring(0, 7));
   const [todayBirthdays, setTodayBirthdays] = useState<{ id: string; name: string }[]>([]);
@@ -429,16 +430,18 @@ export default function StaffPage() {
 
   const fetchTreeData = useCallback(async () => {
     try {
-      const year = new Date().getFullYear();
-      const res = await fetch(`/api/tree?year=${year}`);
+      const res = await fetch(`/api/tree?year=${selectedYear}`);
       if (res.ok) {
         const { data } = await res.json();
         setTreeData(data || {});
-        const total = Object.values((data || {}) as Record<string, number>).reduce((sum, n) => sum + n, 0);
-        setTotalCount(total);
+        // totalCount（ホーム画面のSakura用）は今年のみ更新
+        if (selectedYear === new Date().getFullYear()) {
+          const total = Object.values((data || {}) as Record<string, number>).reduce((sum, n) => sum + n, 0);
+          setTotalCount(total);
+        }
       }
     } catch {}
-  }, []);
+  }, [selectedYear]);
 
   const fetchData = useCallback(async () => {
     const [staffRes, sentRes, receivedRes] = await Promise.all([
@@ -931,7 +934,12 @@ export default function StaffPage() {
             const mm = String(selectedMonth).padStart(2, '0');
             const count = treeData[mm] || 0;
             const cfg = MONTH_CONFIG[selectedMonth - 1];
-            const year = new Date().getFullYear();
+            const currentYear = new Date().getFullYear();
+            const APP_START_YEAR = 2026;
+            const availableYears = Array.from(
+              { length: currentYear - APP_START_YEAR + 1 },
+              (_, i) => APP_START_YEAR + i
+            );
             return (
               <div className="max-w-lg mx-auto fade-slide">
                 {/* タイトル */}
@@ -939,6 +947,22 @@ export default function StaffPage() {
                   <h2 className="text-lg font-bold text-gray-700">みんなの感謝の木 🌳</h2>
                   <p className="text-xs text-gray-400 mt-0.5">ありがとうの数だけ花や実がなります</p>
                 </div>
+
+                {/* 年セレクター（複数年ある場合のみ表示） */}
+                {availableYears.length > 1 && (
+                  <div className="flex gap-2 justify-center mb-3">
+                    {availableYears.map(y => (
+                      <button key={y} onClick={() => setSelectedYear(y)}
+                              className={`px-4 py-1.5 rounded-full text-xs font-bold transition-all active:scale-95
+                                ${y === selectedYear
+                                  ? 'text-white shadow-md'
+                                  : 'bg-white text-gray-500 hover:bg-pink-50 hover:text-pink-500 shadow-sm'}`}
+                              style={y === selectedYear ? { background: 'linear-gradient(135deg,#a8d5a2,#7cc377)' } : {}}>
+                        {y}年
+                      </button>
+                    ))}
+                  </div>
+                )}
 
                 {/* 月セレクター */}
                 <div className="flex flex-wrap gap-1.5 justify-center mb-4">
@@ -959,7 +983,7 @@ export default function StaffPage() {
                   {/* カードヘッダー */}
                   <div className="flex items-center justify-between px-5 pt-4 pb-2">
                     <div>
-                      <p className="text-xs text-gray-400 font-medium">{year}年 {selectedMonth}月</p>
+                      <p className="text-xs text-gray-400 font-medium">{selectedYear}年 {selectedMonth}月</p>
                       <p className="text-xl font-bold text-gray-700">{cfg.name}の木</p>
                     </div>
                     <div className="text-right">
@@ -989,7 +1013,7 @@ export default function StaffPage() {
 
                 {/* 全月サマリー */}
                 <div className="mt-4 bg-white rounded-2xl p-4 shadow-sm">
-                  <p className="text-xs font-bold text-gray-500 mb-3">📅 {year}年 月別ありがとう件数</p>
+                  <p className="text-xs font-bold text-gray-500 mb-3">📅 {selectedYear}年 月別ありがとう件数</p>
                   <div className="grid grid-cols-6 gap-1.5">
                     {Array.from({ length: 12 }, (_, i) => i + 1).map(m => {
                       const key = String(m).padStart(2, '0');
